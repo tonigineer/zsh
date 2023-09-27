@@ -40,5 +40,7 @@ add_plugin "romkatv/gitstatus"
 
 
 source_file gitstatus.zsh
-source plugins/gitstatus/gitstatus.prompt.zsh
 source_file prompt.zsh
+source_file alias.zsh
+
+source $ZSH_DOT_DIR/plugins/gitstatus/gitstatus.prompt.zsh
