@@ -1,10 +1,8 @@
 # ZSH configuration
 #
 # - plugins are cloned automatically
-source ~/.config/zsh/toni.zsh
 
-source_file git_status.zsh
-source_file prompt.zsh
+source ~/.config/zsh/utils.zsh
 
 add_plugin zsh-users/zsh-syntax-highlighting
 {
@@ -30,8 +28,17 @@ add_plugin jeffreytse/zsh-vi-mode
     ZVM_VI_INSERT_ESCAPE_BINDKEY='jk'
 }
 
-add_plugin "zsh-users/zsh-history-substring-search"
+# add_plugin "zsh-users/zsh-history-substring-search"
+# {
+#     bindkey '^k' history-substring-search-up
+#     bindkey '^j' history-substring-search-down
+# }
+
+add_plugin "romkatv/gitstatus"
 {
-    bindkey '^k' history-substring-search-up
-    bindkey '^j' history-substring-search-down
 }
+
+
+source_file gitstatus.zsh
+source plugins/gitstatus/gitstatus.prompt.zsh
+source_file prompt.zsh
