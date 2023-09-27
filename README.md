@@ -1,13 +1,24 @@
 # ZSH configuration
 
-Simple customization to my [zsh](https://www.zsh.org/) shell.
+Simple customization of my [zsh](https://www.zsh.org/) shell.
 
-<kbd><img alt="first impression of customized fish shell" src="./assets/preview.png" style="width: 600px;"/></kbd>
+<kbd><img alt="preview-zsh-prompt" src="./assets/preview.png" style="width: 600px;"/></kbd>
 
 > [!NOTE]
 > [Here](https://github.com/tonigineer/.dotfiles), you can find all of my [Hyprland](https://hyprland.org/) configuration.
 
-<!-- ## Dependencies -->
+## Dependencies
+
+Make sure to have a [NerdFont](https://www.nerdfonts.com/font-downloads) installed:
+
+```sh
+# Example
+wget -P ~/Downloads https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/CascadiaCode.zip
+unzip ~/Downloads/CascadiaCode.zip -d ~/.fonts
+
+fc-cache -v
+fc-list | grep Cas*  # check if it worked
+```
 
 ## Installation
 
