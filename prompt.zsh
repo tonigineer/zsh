@@ -4,8 +4,8 @@
 # Color codes
 # https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124?permalink_comment_id=3892823#gistcomment-3892823
 
-viinsert='%F{blue}%S I %s%f'
-vicommand='%F{green}%S N %s%f'
+viinsert='%F{green}%S I %s%f'
+vicommand='%F{red}%S N %s%f'
 # vivisual='%F{yellow}%S V %s%f'
 # vireplace='%F{red}%S %K{white}R%k %s%f'
 
