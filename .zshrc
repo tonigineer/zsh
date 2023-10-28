@@ -1,16 +1,53 @@
-# ZSH configuration
-#
-# - plugins are cloned automatically
 
-source ~/.config/zsh/utils.zsh
+ZDOT_DIR=/home/$USER/.config/zsh
 
-add_plugin zsh-users/zsh-syntax-highlighting
-{
+# -----------------------------
+# ---------- SOURCING ---------
+# # -----------------------------
+[[ -f ~/.cargo/env ]] && . ~/.cargo/env
+[[ -f ~/.bash_aliases ]] && . ~/.bash_aliases
+
+[[ -d "$HOME/.local/bin" ]] && PATH="$HOME/.local/bin:$PATH"
+[[ -d "$HOME/.cargo/bin" ]] && PATH="$HOME/.cargo/bin:$PATH"
+
+# ------------------------------
+# ---------- UTILITIES ---------
+# ------------------------------
+function load_plugin () {
+    # Load plugin and clone if not available
+    PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)
+
+    if [ ! -d "$ZDOT_DIR/plugins/$PLUGIN_NAME" ]; then
+        git clone "https://github.com/$1.git" "$ZDOT_DIR/plugins/$PLUGIN_NAME"
+
+        # // Customizations
+        if [[ "$1" = "romkatv/gitstatus" ]]; then
+            # Change colors of git prompt to terminal colors.
+            #
+            # NOTE: Badly nested, but basically four color
+            #       values are simply changed within file.
+            while IFS='' read -r a; do
+                echo "${"${"${"${a//'%196F'/%9F}"//'%39F'/%13F}"//'%178F'/%11F}"//'%76F'/%12F}"
+            done < $ZDOT_DIR/plugins/gitstatus/gitstatus.prompt.zsh > $ZDOT_DIR/plugins/gitstatus/gitstatus.prompt.zsh.t
+            mv $ZDOT_DIR/plugins/gitstatus/gitstatus.prompt.zsh{.t,}
+        fi
+    fi
+
+    if [ "$2" = "." ]; then
+        [[ -f "$ZDOT_DIR/plugins/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" ]] && \
+            source "$ZDOT_DIR/plugins/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh"
+        [[ -f "$ZDOT_DIR/plugins/$PLUGIN_NAME/$PLUGIN_NAME.zsh" ]] && \
+            source "$ZDOT_DIR/plugins/$PLUGIN_NAME/$PLUGIN_NAME.zsh"
+    fi
 }
 
-add_plugin zsh-users/zsh-autosuggestions
+
+# ----------------------------
+# ---------- PLUGINS ---------
+# ----------------------------
+load_plugin zsh-users/zsh-autosuggestions .
 {
-    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#74c7ec"  # bg=cyan,bold,underline
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#444b6a,underline"  # bg=cyan,bold,underline
     ZSH_AUTOSUGGEST_STRATEGY=(history completion)
     setopt APPEND_HISTORY
     setopt SHARE_HISTORY
@@ -22,25 +59,27 @@ add_plugin zsh-users/zsh-autosuggestions
     bindkey '^ ' autosuggest-accept
 }
 
-add_plugin jeffreytse/zsh-vi-mode
+load_plugin jeffreytse/zsh-vi-mode .
 {
     ZVM_VI_INSERT_ESCAPE_BINDKEY='^['
     ZVM_VI_INSERT_ESCAPE_BINDKEY='jk'
 }
 
-# add_plugin "zsh-users/zsh-history-substring-search"
-# {
-#     bindkey '^k' history-substring-search-up
-#     bindkey '^j' history-substring-search-down
-# }
-
-add_plugin "romkatv/gitstatus"
+load_plugin romkatv/gitstatus
 {
+    # Only prompt file that must be sourced,
+    # different to the other. Therefore second
+    # argument for load_plugin.
+    source $ZDOT_DIR/plugins/gitstatus/gitstatus.prompt.zsh
+}
+
+load_plugin zsh-users/zsh-syntax-highlighting .
+{
+    # Must be loaded last
 }
 
 
-source_file gitstatus.zsh
-source_file prompt.zsh
-source_file alias.zsh
-
-source $ZSH_DOT_DIR/plugins/gitstatus/gitstatus.prompt.zsh
+# ---------------------------
+# ---------- VANITY ---------
+# ---------------------------
+source $ZDOT_DIR/prompt.zsh
