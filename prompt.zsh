@@ -5,7 +5,7 @@ vicommand='%7F[%1F%7F]%f '
 
 PRPT_VIM=$viinsert
 PRPT_TIME='%8F%D{%H:%M}%f '
-PRPT_USR='%12F%n%8F:%11F%m%f '
+PRPT_USR='%14F%n%8F:%11F%m%f '
 PRPT_DIR='%15F%$((-${#GITSTATUS_PROMPT}-1))<…<%~%<<%f '
 PRPT_GIT='${GITSTATUS_PROMPT:+ %8F⌜%9F%f $GITSTATUS_PROMPT%8F⌟%f}'
 PRPT_BR=$'\n'
