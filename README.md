@@ -1,29 +1,23 @@
 # ZSH configuration
 
-Simple customization of my [zsh](https://www.zsh.org/) shell, **without** [oh-my-zsh](https://ohmyz.sh/).
+This is a simple customization of my [ZSH](https://www.zsh.org/) shell, without using [oh-my-zsh](https://ohmyz.sh/). This configuration is part of my [dotfiles](https://github.com/tonigineer/.dotfiles).
 
-<kbd><img alt="preview-zsh-prompt" src="./assets/preview.png" style="width: 600px;"/></kbd>
+## 🚀 Features
 
-## Features
+All features are bootstrapped during the first startup:
 
-- [x] Auto suggestions
+- [x] Auto-suggestions
 - [x] Syntax highlighting
 - [x] VI mode
-- [x] Git status
+- [x] Git status integration
 
-> [!IMPORTANT]
-> All plugins will be installed automatically at the first start.
+## 💾 Installation
 
-## Installation
-
-Simply clone this repository into your user config folder and take care, that the `.zshrc` will be loaded:
+To install the configuration, clone this repository into your user config folder and ensure that the `.zshrc` file is properly loaded:
 
 ```sh
 git clone https://github.com/tonigineer/zsh.git ~/.config/zsh
 
-# Symlink .zshrc (alt: set ZDOTDIR in env)
+# Symlink .zshrc to your home directory (alternative: set ZDOTDIR in your environment)
 ln -s ~/.config/zsh/.zshrc ~/.zshrc
 ```
-
-> [!NOTE]
-> [Have a look](https://github.com/tonigineer/.dotfiles) at my [Hyprland](https://hyprland.org/) configuration.
