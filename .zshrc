@@ -47,7 +47,7 @@ function load_plugin () {
 # ----------------------------
 load_plugin zsh-users/zsh-autosuggestions .
 {
-    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#444b6a,underline"  # bg=cyan,bold,underline
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#444b6a"  # bg=cyan,bold,underline
     ZSH_AUTOSUGGEST_STRATEGY=(history completion)
     setopt APPEND_HISTORY
     setopt SHARE_HISTORY
@@ -76,6 +76,9 @@ load_plugin romkatv/gitstatus
 load_plugin zsh-users/zsh-syntax-highlighting .
 {
     # Must be loaded last
+    . $HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    ZSH_HIGHLIGHT_STYLES[path]=none
+    ZSH_HIGHLIGHT_STYLES[path_prefix]=none
 }
 
 
