@@ -1,29 +1,32 @@
-# COLOR ID's https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124?permalink_comment_id=3892823#gistcomment-3892823
+# Terminal color indices (256-color palette):
+# https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124?permalink_comment_id=3892823#gistcomment-3892823
 
-viinsert='%7F[%2F%7F]%f '
-vicommand='%7F[%1F%7F]%f '
+# vi-mode indicators
+_p_vi_ins='%7F[%2F%7F]%f '
+_p_vi_cmd='%7F[%1F%7F]%f '
 
-PRPT_VIM=$viinsert
-PRPT_TIME='%8F%D{%H:%M}%f '
-PRPT_USR='%14F%n%8F:%11F%m%f '
-PRPT_DIR='%15F%$((-${#GITSTATUS_PROMPT}-1))<…<%~%<<%f '
-PRPT_GIT='${GITSTATUS_PROMPT:+ %8F⌜%9F%f $GITSTATUS_PROMPT%8F⌟%f}'
-PRPT_BR=$'\n'
-PRPT_PRPT='~%F{%(?.15.9)} ❯ %f'
+# prompt components (globals because zle widgets mutate _p_vimode)
+typeset -g _p_vimode=$_p_vi_ins
+typeset -g _p_time='%8F%D{%H:%M}%f '
+typeset -g _p_userhost='%14F%n%8F:%11F%m%f '
+typeset -g _p_cwd='%15F%$((-${#GITSTATUS_PROMPT}-1))<…<%~%<<%f '
+typeset -g _p_git='${GITSTATUS_PROMPT:+ %8F⌜%9F%f $GITSTATUS_PROMPT%8F⌟%f}'
+typeset -g _p_prompt='~%(?.%F{15}.%F{9}) ❯ %f'
 
-# WORKAROUND: otherwise, VI mode must change once to display wanted prompt
-PS1=$PRPT_VIM$PRPT_TIME$PRPT_USR$PRPT_DIR$PRPT_GIT$PRPT_BR$PRPT_PRPT
+build_prompt() {
+    PS1="${_p_vimode}${_p_time}${_p_userhost}${_p_cwd}${_p_git}"$'\n'"${_p_prompt}"
+}
 
+# prime prompt before any keymap event
+build_prompt
+
+# single body handles both widgets: set vi-mode segment then redraw
 function zle-line-init zle-keymap-select {
     case $KEYMAP in
-        (vicmd)       PRPT_VIM=$vicommand ;;
-        (viins|main)  PRPT_VIM=$viinsert  ;;
-        (*)           PRPT_VIM=$viinsert  ;;
-        # Is there a vireplace and vivisual I don't know about?
+        vicmd) _p_vimode=$_p_vi_cmd ;;
+        *)     _p_vimode=$_p_vi_ins  ;;
     esac
-
-    PS1=$PRPT_VIM$PRPT_TIME$PRPT_USR$PRPT_DIR$PRPT_GIT$PRPT_BR$PRPT_PRPT
-
+    build_prompt
     zle reset-prompt
 }
 

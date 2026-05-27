@@ -1,23 +1,41 @@
-# ZSH configuration
+# ZSH Configuration
 
-This is a simple customization of my [ZSH](https://www.zsh.org/) shell, without using [oh-my-zsh](https://ohmyz.sh/). This configuration is part of my [dotfiles](https://github.com/tonigineer/dotfiles).
+A lightweight, plugin-based Zsh setup without [oh-my-zsh](https://ohmyz.sh/).
+Plugins bootstrap automatically on first launch.
+Part of my [dotfiles](https://github.com/tonigineer/dotfiles).
 
 ## Features
 
-All features are bootstrapped during the first startup:
+- **Auto-suggestions** — Inline suggestions from history and completions
+- **Syntax highlighting** — Real-time command validation
+- **Vi mode** — `jk` to escape insert mode
+- **Git status** — Branch and dirty-state in prompt via [gitstatus](https://github.com/romkatv/gitstatus)
+- **Yazi integration** — `y` wrapper changes directory on quit
 
-- [x] Auto-suggestions
-- [x] Syntax highlighting
-- [x] VI mode
-- [x] Git status integration
+## Prompt
+
+Two-line prompt with an active vi-mode indicator (insert vs. command).
+Built with `zle-line-init` and `zle-keymap-select` redraw hooks.
+Uses the 256-color palette for consistent theming across terminals.
+
+## Requirements
+
+- Zsh 5.0+
+- Git (for plugin bootstrapping)
+- Optional: [Yazi](https://github.com/sxyazi/yazi) for the file-manager wrapper
+
+## File layout
+
+| File | Purpose |
+|------|---------|
+| `.zshrc` | Entry point: plugins, history, key bindings, utilities |
+| `prompt.zsh` | Prompt builder and zle redraw widgets |
 
 ## Installation
 
-To install the configuration, clone this repository into your user config folder and ensure that the `.zshrc` file is properly loaded:
-
 ```sh
 git clone https://github.com/tonigineer/zsh.git ~/.config/zsh
-
-# Symlink .zshrc to your home directory (alternative: set ZDOTDIR in your environment)
 ln -s ~/.config/zsh/.zshrc ~/.zshrc
 ```
+
+Start a new shell. The four plugins clone and load on first run.

@@ -1,101 +1,99 @@
+ZDOTDIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
 
-ZDOT_DIR=/home/$USER/.config/zsh
+# ———— SOURCING ————————————————————————————————————————————————————————————————
 
-# -----------------------------
-# ---------- SOURCING ---------
-# # -----------------------------
-[[ -f ~/.cargo/env ]] && . ~/.cargo/env
-[[ -f ~/.bash_aliases ]] && . ~/.bash_aliases
+[[ -f ~/.cargo/env ]] && source ~/.cargo/env
+[[ -f ~/.bash_aliases ]] && source ~/.bash_aliases
 
 [[ -d "$HOME/.local/bin" ]] && PATH="$HOME/.local/bin:$PATH"
 [[ -d "$HOME/.cargo/bin" ]] && PATH="$HOME/.cargo/bin:$PATH"
 
-# ------------------------------
-# ---------- UTILITIES ---------
-# ------------------------------
-function load_plugin () {
-    # Load plugin and clone if not available
-    PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)
+# ———— UTILITIES ———————————————————————————————————————————————————————————————
 
-    if [ ! -d "$ZDOT_DIR/plugins/$PLUGIN_NAME" ]; then
-        git clone "https://github.com/$1.git" "$ZDOT_DIR/plugins/$PLUGIN_NAME"
+function load_plugin() {
+    local repo="$1" autoload="$2"
+    local plugin="${repo##*/}"
+    local dir="$ZDOTDIR/plugins/$plugin"
 
-        # // Customizations
-        if [[ "$1" = "romkatv/gitstatus" ]]; then
-            # Change colors of git prompt to terminal colors.
-            #
-            # NOTE: Badly nested, but basically four color
-            #       values are simply changed within file.
-            while IFS='' read -r a; do
-                echo "${"${"${"${a//'%196F'/%9F}"//'%39F'/%13F}"//'%178F'/%11F}"//'%76F'/%12F}"
-            done < $ZDOT_DIR/plugins/gitstatus/gitstatus.prompt.zsh > $ZDOT_DIR/plugins/gitstatus/gitstatus.prompt.zsh.t
-            mv $ZDOT_DIR/plugins/gitstatus/gitstatus.prompt.zsh{.t,}
+    if [[ ! -d "$dir" ]]; then
+        git clone --depth=1 "https://github.com/$repo.git" "$dir"
+
+        if (( $? != 0 )); then
+            echo "load_plugin: failed to clone $repo" >&2
+            return 1
+        fi
+
+        if [[ "$repo" == "romkatv/gitstatus" ]]; then
+            sed -i \
+                -e 's/%196F/%9F/g' \
+                -e 's/%39F/%13F/g' \
+                -e 's/%178F/%11F/g' \
+                -e 's/%76F/%12F/g' \
+                "$dir/gitstatus.prompt.zsh"
         fi
     fi
 
-    if [ "$2" = "." ]; then
-        [[ -f "$ZDOT_DIR/plugins/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" ]] && \
-            source "$ZDOT_DIR/plugins/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh"
-        [[ -f "$ZDOT_DIR/plugins/$PLUGIN_NAME/$PLUGIN_NAME.zsh" ]] && \
-            source "$ZDOT_DIR/plugins/$PLUGIN_NAME/$PLUGIN_NAME.zsh"
+    if [[ "$autoload" == "." ]]; then
+        local file
+        for file in "$plugin.plugin.zsh" "$plugin.zsh"; do
+            [[ -f "$dir/$file" ]] && source "$dir/$file"
+        done
     fi
 }
 
+# ———— PLUGINS —————————————————————————————————————————————————————————————————
 
-# ----------------------------
-# ---------- PLUGINS ---------
-# ----------------------------
 load_plugin zsh-users/zsh-autosuggestions .
 {
-    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#444b6a"  # bg=cyan,bold,underline
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#444b6a"
     ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-    setopt APPEND_HISTORY
-    setopt SHARE_HISTORY
-    HISTFILE=$HOME/.zhistory
-    SAVEHIST=1000
-    HISTSIZE=999
-    setopt HIST_EXPIRE_DUPS_FIRST
-    setopt EXTENDED_HISTORY
     bindkey '^ ' autosuggest-accept
 }
 
 load_plugin jeffreytse/zsh-vi-mode .
 {
-    ZVM_VI_INSERT_ESCAPE_BINDKEY='^['
     ZVM_VI_INSERT_ESCAPE_BINDKEY='jk'
 }
 
 load_plugin romkatv/gitstatus
 {
-    # Only prompt file that must be sourced,
-    # different to the other. Therefore second
-    # argument for load_plugin.
-    source $ZDOT_DIR/plugins/gitstatus/gitstatus.prompt.zsh
+    source "$ZDOTDIR/plugins/gitstatus/gitstatus.prompt.zsh"
 }
 
 load_plugin zsh-users/zsh-syntax-highlighting .
 {
-    # Must be loaded last
-    . $HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    source "$ZDOTDIR/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
     ZSH_HIGHLIGHT_STYLES[path]=none
     ZSH_HIGHLIGHT_STYLES[path_prefix]=none
 }
 
-
-# ---------------------------
-# ----------- YAZI ----------
-# ---------------------------
+# ———— YAZI FILE MANAGER INTEGRATION ———————————————————————————————————————————
 
 function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	yazi "$@" --cwd-file="$tmp"
-	IFS= read -r -d '' cwd < "$tmp"
-	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
-	rm -f -- "$tmp"
+    local tmp cwd
+    tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+    trap 'rm -f -- "$tmp"' EXIT INT TERM
+
+    yazi "$@" --cwd-file="$tmp"
+    cwd="$(< "$tmp")"
+
+    [[ -n "$cwd" && "$cwd" != "$PWD" ]] && builtin cd -- "$cwd"
 }
 
+# ———— HISTORY —————————————————————————————————————————————————————————————————
 
-# ---------------------------
-# ---------- VANITY ---------
-# ---------------------------
-source $ZDOT_DIR/prompt.zsh
+HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/history"
+[[ -d "${HISTFILE:h}" ]] || mkdir -p "${HISTFILE:h}"
+
+HISTSIZE=10000
+SAVEHIST=10000
+
+setopt SHARE_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt EXTENDED_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+
+# ———— PROMPT ——————————————————————————————————————————————————————————————————
+
+source "$ZDOTDIR/prompt.zsh"
